@@ -21,9 +21,23 @@ st.info('当前不显示准确率或 F1；人工金标准和固定模型预测�
 if split=='heldout_test':
     st.warning('独立测试只供人工标注。不要把这里的原文或答案发给 AI 调试 Prompt；请先完成开发集规则调整。')
 tasks=store.tasks(split); records=store.records(split)
-rid=st.selectbox('评论编号',[t['review_id'] for t in tasks],format_func=lambda i:f'{next(j+1 for j,t in enumerate(tasks) if t["review_id"]==i):03d} · {i[:12]} · '+('已复核' if records.get(i,{}).get('review_status')=='approved' else '已保存' if i in records else '待标注'))
+task_numbers={t['review_id']:j+1 for j,t in enumerate(tasks)}
+selection_key='annotation_review_id_'+split
+task_ids=list(task_numbers)
+unreviewed=[i for i in task_ids if records.get(i,{}).get('review_status')!='approved']
+if st.button('下一条未复核',disabled=not unreviewed):
+    current=st.session_state.get(selection_key)
+    offset=task_ids.index(current)+1 if current in task_ids else 0
+    ordered=task_ids[offset:]+task_ids[:offset]
+    st.session_state[selection_key]=next(i for i in ordered if i in unreviewed)
+# Widget identity must not depend on mutable review statuses. Streamlit can recreate
+# a selectbox when its formatted options change, resetting it to the first item.
+rid=st.selectbox('评论编号',task_ids,key=selection_key,
+    format_func=lambda i:f'{task_numbers[i]:03d} · {i[:12]}')
 task=next(t for t in tasks if t['review_id']==rid)
 saved=records.get(rid,{})
+st.caption('当前评论状态：'+('已人工复核' if saved.get('review_status')=='approved' else '已保存，待复核' if saved else '待标注'))
+st.caption('保存或复核后保持在当前条；需要继续时再点“下一条未复核”。切换评论前请先保存。')
 if store.freeze_record(split):
     st.success('独立测试答案已冻结。')
     st.json(store.freeze_record(split))
