@@ -1,0 +1,115 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "confidence",
+    "issue_summary",
+    "issues",
+    "needs_review",
+    "review_id",
+    "scope_status",
+    "sentiment",
+    "sentiment_evidence",
+    "user_need"
+  ],
+  "properties": {
+    "review_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "scope_status": {
+      "type": "string",
+      "enum": [
+        "in_scope",
+        "out_of_scope",
+        "uncertain"
+      ]
+    },
+    "sentiment": {
+      "type": "string",
+      "enum": [
+        "mixed",
+        "negative",
+        "neutral",
+        "positive",
+        "unknown"
+      ]
+    },
+    "sentiment_evidence": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "issues": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "label",
+          "evidence"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "enum": [
+              "after_sales.refund_difficulty",
+              "after_sales.return_exchange",
+              "after_sales.slow_response",
+              "delivery.delay",
+              "delivery.packaging_damage",
+              "delivery.tracking_issue",
+              "delivery.wrong_or_missing_item",
+              "other.specific_other_issue",
+              "product_description.image_mismatch",
+              "product_description.missing_information",
+              "product_description.spec_mismatch",
+              "product_function.function_failure",
+              "product_function.performance_gap",
+              "product_price.high_price",
+              "product_price.low_value",
+              "product_price.price_change",
+              "product_quality.color_fading",
+              "product_quality.damage",
+              "product_quality.durability",
+              "product_quality.material_quality",
+              "product_quality.pilling",
+              "product_quality.workmanship",
+              "shopping_experience.communication_issue",
+              "shopping_experience.ordering_issue",
+              "size_spec.length_mismatch",
+              "size_spec.size_inconsistency",
+              "size_spec.too_large",
+              "size_spec.too_small"
+            ]
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "user_need": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "issue_summary": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "needs_review": {
+      "type": "boolean"
+    }
+  }
+}
