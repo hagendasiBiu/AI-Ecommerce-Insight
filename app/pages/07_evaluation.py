@@ -52,8 +52,10 @@ st.caption('计时状态：'+('进行中' if st.session_state.annotation_started
 scope_options=['']+sorted(contract.SCOPES); sentiment_options=['']+sorted(contract.SENTIMENTS)
 with st.form('annotation_'+token):
     actor=st.text_input('真实标注者代号',value=saved.get('annotator_id',''))
-    scope=st.selectbox('业务范围',scope_options,index=scope_options.index(saved.get('scope_status','')))
-    sentiment=st.selectbox('情感',sentiment_options,index=sentiment_options.index(saved.get('sentiment','')))
+    scope=st.selectbox('业务范围',scope_options,index=scope_options.index(saved.get('scope_status','')),
+        format_func=lambda x:{'':'请选择','in_scope':'服饰及相关配送售后 · in_scope','out_of_scope':'明确其他业务 · out_of_scope','uncertain':'无法判断 · uncertain'}[x])
+    sentiment=st.selectbox('情感',sentiment_options,index=sentiment_options.index(saved.get('sentiment','')),
+        format_func=lambda x:{'':'请选择','positive':'正向 · positive','negative':'负向 · negative','mixed':'正负混合 · mixed','neutral':'中性客观 · neutral','unknown':'信息不足 · unknown'}[x])
     labels=st.multiselect('负向具体问题；没有则留空',sorted(contract.ALLOWED_LABELS),default=saved.get('issue_labels',[]))
     evidence_text=st.text_area('问题证据 JSON（每个标签一条原文）',value=json.dumps(saved.get('evidence',[]),ensure_ascii=False,indent=2),height=150,help='格式：[{"label":"完整标签","quote":"原文连续片段"}]')
     need=st.text_input('用户需求（推测请注明；无则留空）',value=saved.get('user_need',''))

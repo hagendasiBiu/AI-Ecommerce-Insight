@@ -11,6 +11,9 @@ from src.review_analysis import validate_batch_response
 
 def main():
     store=AnnotationStore(ROOT)
+    if not (ROOT/'data/sample/annotation_heldout_test.csv').exists():
+        print('No local annotation tasks. Public code does not distribute source comments. No API request made.')
+        return
     frozen=store.freeze_record('heldout_test')
     if not frozen:
         print(json.dumps({'status':'pending_human_gold','progress':store.progress('heldout_test')},ensure_ascii=False))
