@@ -25,10 +25,11 @@ pages = [st.Page('pages/01_dashboard.py',title='数据总览',icon='📊',defaul
          st.Page('pages/04_delivery_analysis.py',title='履约线索',icon='🚚'),
          st.Page('pages/05_strategy_center.py',title='策略中心',icon='🧭'),
          st.Page('pages/06_report_center.py',title='报告中心',icon='📄'),
-         st.Page('pages/07_evaluation.py',title='人工标注与评估',icon='📝')]
+         st.Page('pages/07_evaluation.py',title='标注与评估',icon='📝')]
 page = st.navigation(pages)
 with st.sidebar:
     st.header('消费者洞察工作台')
+    st.toggle('演示模式（隐藏评论正文）',value=False,key='demo_mode')
     spaces = service.workspaces()
     options = [w['id'] for w in spaces]
     names = {w['id']:w['name'] for w in spaces}

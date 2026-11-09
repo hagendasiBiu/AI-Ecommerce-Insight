@@ -32,7 +32,7 @@ class AnnotationSelectionTests(unittest.TestCase):
             f'sys.path.insert(0,{str(ROOT)!r})\n'
             'real_is_file=Path.exists\n'
             'from unittest.mock import patch\n'
-            f'with patch.object(Path,"exists",lambda p: True if str(p).endswith(("annotation_prompt_dev.csv","annotation_heldout_test.csv")) else real_is_file(p)):\n'
+            f'with patch.object(Path,"exists",lambda p: False if p.name=="ai_annotations_final.json" else True if str(p).endswith(("annotation_prompt_dev.csv","annotation_heldout_test.csv")) else real_is_file(p)):\n'
             f'    exec(compile(Path({str(ROOT/"app/pages/07_evaluation.py")!r}).read_text(encoding="utf-8"),{str(ROOT/"app/pages/07_evaluation.py")!r},"exec"),dict(__file__={str(ROOT/"app/pages/07_evaluation.py")!r}))\n',encoding='utf-8')
         return AppTest.from_file(str(wrapper),default_timeout=20).run()
 

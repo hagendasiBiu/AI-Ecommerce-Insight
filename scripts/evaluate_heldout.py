@@ -11,6 +11,10 @@ from src.review_analysis import validate_batch_response
 
 def main():
     store=AnnotationStore(ROOT)
+    study=ROOT/'data/processed/ai_annotation_study.json'
+    if study.exists() and json.loads(study.read_text(encoding='utf-8')).get('user_authorized_ai_only'):
+        print('AI-only study: former heldout has been repurposed. Independent-human scoring is not applicable.')
+        return
     if not (ROOT/'data/sample/annotation_heldout_test.csv').exists():
         print('No local annotation tasks. Public code does not distribute source comments. No API request made.')
         return

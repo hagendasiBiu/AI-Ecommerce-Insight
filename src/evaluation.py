@@ -40,7 +40,7 @@ class AnnotationStore:
     def tasks(self, split):
         if split not in SPLITS:
             raise ValueError('Unknown annotation split')
-        # Callers must not log heldout text. Only the human-facing UI displays it.
+        # Do not log source text. User-authorized AI-only studies use separate artifacts.
         frame = pd.read_csv(self.root/'data/sample'/SPLITS[split], dtype=str, keep_default_na=False)
         if frame.review_id.duplicated().any():
             raise ValueError('Duplicate task IDs')
@@ -128,6 +128,9 @@ class AnnotationStore:
             db.commit()
 
     def freeze(self, actor):
+        study_path=self.root/'data/processed/ai_annotation_study.json'
+        if study_path.exists() and json.loads(study_path.read_text(encoding='utf-8')).get('user_authorized_ai_only'):
+            raise ValueError('这批保留样本已进入 AI 研究，不能再冻结为独立人工测试；需另设新样本。')
         if not actor.strip():
             raise ValueError('冻结操作需要真实操作人。')
         split='heldout_test'

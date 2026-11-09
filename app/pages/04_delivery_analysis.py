@@ -11,7 +11,7 @@ for issue in issues:
         st.subheader(issue['issue_label'])
         st.write(f"{issue['review_count']} 条评论提及；分母为 {issue['denominator']} 条有效样本。尚未人工确认。")
         for ref in issue['evidence']:
-            st.write('原文证据：'+ref['quote'])
+            st.write('原文证据：'+('[演示模式已隐藏原文]' if st.session_state.get('demo_mode',False) else ref['quote']))
             st.caption('评论 ID：'+ref['review_id'])
 if not issues: st.info('当前已分析样本没有标记配送问题；不能据此推断履约没有问题。')
 st.subheader('补充资料后才能计算的指标')

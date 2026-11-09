@@ -46,6 +46,12 @@ class AnnotationTests(unittest.TestCase):
         self.store.save('prompt_dev','0',{**self.body,'notes':'修订'})
         self.assertEqual(self.store.records('prompt_dev')['0']['review_status'],'pending')
 
+    def test_ai_exposed_holdout_cannot_be_frozen_as_independent_human_gold(self):
+        study=self.root/'data/processed/ai_annotation_study.json'
+        study.write_text(json.dumps({'user_authorized_ai_only':True}),encoding='utf-8')
+        with self.assertRaisesRegex(ValueError,'已进入 AI 研究'):
+            self.store.freeze('human')
+
     def test_freeze_requires_all_reviewed_and_prevents_edits(self):
         with self.assertRaises(ValueError): self.store.freeze('human')
         for i in range(100):

@@ -8,7 +8,13 @@ from src.review_analysis import contract
 
 ROOT=Path(__file__).resolve().parents[2]
 store=AnnotationStore(ROOT)
-st.title('人工标注与评估')
+st.title('标注与评估')
+if (ROOT/'data/processed/ai_annotations_final.json').exists():
+    mode=st.radio('查看模式',['AI 标注结果','人工标注存档（可选）'],horizontal=True,key='evaluation_view_mode')
+    if mode=='AI 标注结果':
+        from app.ai_results import render_ai_results
+        render_ai_results(ROOT)
+        st.stop()
 if not all((ROOT/'data/sample'/name).exists() for name in ['annotation_prompt_dev.csv','annotation_heldout_test.csv']):
     st.info('公开代码包不包含原始评论或人工答案。请按 README 准备本地数据后生成固定标注任务。')
     st.stop()
@@ -19,7 +25,10 @@ cols=st.columns(3)
 cols[0].metric('待标注',stats['total']-stats['completed']); cols[1].metric('已保存',stats['completed']); cols[2].metric('已人工复核',stats['reviewed'])
 st.info('当前不显示准确率或 F1；人工金标准和固定模型预测均齐备后才能计算。validated 只表示结构及证据校验通过。')
 if split=='heldout_test':
-    st.warning('独立测试只供人工标注。不要把这里的原文或答案发给 AI 调试 Prompt；请先完成开发集规则调整。')
+    if (ROOT/'data/processed/ai_annotations_final.json').exists():
+        st.warning('本批已进入 AI 研究，不再作为独立人工测试。此处只保留人工存档入口。')
+    else:
+        st.warning('独立测试只供人工标注。不要把这里的原文或答案发给 AI 调试 Prompt；请先完成开发集规则调整。')
 tasks=store.tasks(split); records=store.records(split)
 task_numbers={t['review_id']:j+1 for j,t in enumerate(tasks)}
 selection_key='annotation_review_id_'+split

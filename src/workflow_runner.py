@@ -15,7 +15,9 @@ def load_env(root):
         for line in path.read_text(encoding='utf-8-sig').splitlines():
             if '=' in line and not line.lstrip().startswith('#'):
                 key, value = line.split('=', 1)
-                os.environ.setdefault(key.strip(), value.strip().strip('\"').strip("'"))
+                # The local .env is this desktop project's explicit configuration.
+                # Reload corrections instead of retaining a previous app's key in Streamlit.
+                os.environ[key.strip()] = value.strip().strip('\"').strip("'")
 
 
 def run_recorded(root, inputs, key_name, workflow_version, purpose, timeout=180):
@@ -24,7 +26,10 @@ def run_recorded(root, inputs, key_name, workflow_version, purpose, timeout=180)
     key = os.environ.get(key_name, '')
     base = os.environ.get('DIFY_API_BASE_URL', '')
     client = DifyClient(base, key, timeout=timeout)
-    digest = hashlib.sha256(json.dumps([base, key_name, workflow_version, inputs], sort_keys=True,
+    # The same setting name may later point to a different Dify application.
+    # Never reuse another app's response after credentials have been corrected.
+    credential_fingerprint=hashlib.sha256(key.encode()).hexdigest()
+    digest = hashlib.sha256(json.dumps([base, key_name, credential_fingerprint, workflow_version, inputs], sort_keys=True,
                                       ensure_ascii=False).encode()).hexdigest()
     directory = root / 'data/processed/phase4_runs'
     directory.mkdir(parents=True, exist_ok=True)
